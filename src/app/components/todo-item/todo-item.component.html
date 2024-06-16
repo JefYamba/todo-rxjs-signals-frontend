@@ -1,0 +1,33 @@
+<div class="card">
+    <div class="card-body">
+        @if (!updateState()){
+            <div class="d-flex gap-3 align-items-center">
+                <span class="">1</span>
+                <span class="flex-fill">Test of the task</span>
+                <span class="d-flex gap-1" >
+                <button (click)="changeState()" class="btn btn-outline-info btn-sm">
+                    <i class="bi bi-pen"></i>
+                </button>
+                <button class="btn btn-outline-danger btn-sm">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </span>
+            </div>
+        } @else {
+            <div class="d-flex gap-3 align-items-center">
+            <span class="flex-fill">
+                <input type="text" class="form-control form-control-sm">
+            </span>
+                <span class="d-flex gap-1" >
+                <button class="btn btn-outline-success btn-sm">
+                    <i class="bi bi-floppy"></i>
+                </button>
+                <button (click)="changeState()" class="btn btn-outline-warning btn-sm">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </span>
+            </div>
+        }
+
+    </div>
+</div>
