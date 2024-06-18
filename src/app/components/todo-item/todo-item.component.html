@@ -1,33 +1,43 @@
-<div class="card">
-    <div class="card-body">
-        @if (!updateState()){
-            <div class="d-flex gap-3 align-items-center">
-                <span class="">1</span>
-                <span class="flex-fill">Test of the task</span>
-                <span class="d-flex gap-1" >
-                <button (click)="changeState()" class="btn btn-outline-info btn-sm">
-                    <i class="bi bi-pen"></i>
-                </button>
-                <button class="btn btn-outline-danger btn-sm">
-                    <i class="bi bi-trash"></i>
-                </button>
-            </span>
+<div class="flex flex-col gap-3">
+    @if (todo(); as todo) {
+        <div
+            (click)="changeState()"
+            class="select-none flex justify-between items-center px-5 py-3 shadow shadow-cyan-700/15 hover:shadow-cyan-500/50 hover:bg-sky-50 hover:cursor-pointer bg-slate-50 rounded-lg transition-all duration-300 delay-150"
+        >
+            <div class="text-lg font-semibold flex gap-3">
+                <span
+                    [ngClass]="isOpened() ? 'rotate-90' : ''"
+                    class="transition-transform duration-150"
+                >
+                    <i class="fa-solid fa-angle-right"></i>
+                </span>
+                <span>{{ todo.title }}</span>
             </div>
-        } @else {
-            <div class="d-flex gap-3 align-items-center">
-            <span class="flex-fill">
-                <input type="text" class="form-control form-control-sm">
-            </span>
-                <span class="d-flex gap-1" >
-                <button class="btn btn-outline-success btn-sm">
-                    <i class="bi bi-floppy"></i>
-                </button>
-                <button (click)="changeState()" class="btn btn-outline-warning btn-sm">
-                    <i class="bi bi-x-lg"></i>
-                </button>
-            </span>
+            <div class="flex items-center text-sm">
+                @switch (todo.status) {
+                    @case (Status.NOT_STARTED) {
+                        <span
+                            class="py-0.5 px-2 bg-red-400 rounded-md text-white"
+                        >Not started</span
+                        >
+                    }
+                    @case (Status.ON_GOING) {
+                        <span
+                            class="py-0.5 px-2 bg-blue-400 rounded-md text-white"
+                        >On going</span
+                        >
+                    }
+                    @case (Status.COMPLETED) {
+                        <span
+                            class="py-0.5 px-2 bg-green-400 rounded-md text-white"
+                        >Completed</span
+                        >
+                    }
+                }
             </div>
+        </div>
+        @if (isOpened()) {
+            <app-todo-detail [isOpened]="isOpened()" [@fadeInOut]="isOpened()" [todo]="todo"></app-todo-detail>
         }
-
-    </div>
+    }
 </div>

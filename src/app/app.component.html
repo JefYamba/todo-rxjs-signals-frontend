@@ -1,6 +1,54 @@
-<div class="container my-5">
-  <h1 class="h1">Todos</h1>
-  <ul class="list-group">
-    <app-todo-item></app-todo-item>
-  </ul>
+<div class="mx-auto max-w-xl text-cyan-900">
+    <div
+        class="select-none flex justify-between items-center text-3xl font-bold px-5 py-3 bg-slate-50 shadow shadow-cyan-700/20 rounded-lg relative"
+    >
+        <span>My Todos</span>
+        <div class="flex gap-8 items-center">
+            <form class="">
+                <select
+                    class="w-40 focus:border-cyan-600 focus:border-double block px-3 py-2 text-cyan-900/70 outline-0 text-base font-semibold bg-slate-50 border-2 border-slate-300 rounded-md focus:ring-cyan-500"
+                >
+                    <option value="ALL">All</option>
+                    <option value="US">Non started</option>
+                    <option value="CA">Started</option>
+                    <option value="CA">Complete</option>
+                </select>
+            </form>
+        </div>
+    </div>
+    @if (todoState$ | async; as todoState) {
+        @if (todoState.state === TodoEditingState.EDITING_OFF) {
+            <div class="mt-4 mb-12 relative">
+                <button
+                    (click)="getEditState()"
+                    class="-top-10 absolute right-48 flex items-cente justify-center text-2xl text-blue-600 min-h-12 bg-sky-50 rounded-full shadow shadow-cyan-700/50 aspect-square hover:shadow-cyan-500/50 hover:bg-sky-100 transition-colors duration-150"
+                >
+                    <i class="m-auto fa-solid fa-plus"></i>
+                </button>
+            </div>
+        } @else {
+            <div class="mt-4" [@fadeInOut]="todoState.state === TodoEditingState.EDITING_ON">
+                <app-todo-form></app-todo-form>
+            </div>
+        }
+    }
+    <div class="mt-4 select-none">
+        @if (todos$ | async; as todolist) {
+            @if (todolist.data.todos?.content?.length == 0) {
+                <div
+                    class="shadow-cyan-700/15 rounded-lg p-3 bg-red-200 shadow"
+                >
+                    Empty
+                </div>
+            } @else {
+                <div
+                    class="flex flex-col gap-3 transition-all delay-200 duration-300"
+                >
+                    @for (todo of todolist.data.todos?.content; track todo.id) {
+                        <app-todo-item [todo]="todo"></app-todo-item>
+                    }
+                </div>
+            }
+        }
+    </div>
 </div>

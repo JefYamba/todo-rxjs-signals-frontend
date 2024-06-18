@@ -1,0 +1,36 @@
+<div
+    class="flex flex-col gap-3 p-5 bg-slate-50 shadow shadow-cyan-700/15 rounded-lg hover:shadow-cyan-500/50"
+>
+    <form class="flex flex-col gap-3">
+        <div class="flex flex-col gap-2">
+            <label for="title">Tile</label>
+            <input
+                class="text-cyan-900/70 outline-0 text-base font-semibold bg-slate-50 border-2 border-slate-300 rounded-md focus:ring-cyan-500 focus:border-cyan-600 focus:border-double block w-full px-3 py-2"
+                id="title"
+                name=""
+                type="text"
+            />
+        </div>
+        <div class="flex flex-col gap-2">
+            <label for="content">Content</label>
+            <textarea
+                class="resize-none h-44 text-cyan-900/70 outline-0 text-base font-semibold bg-slate-50 border-2 border-slate-300 rounded-md focus:ring-cyan-500 focus:border-cyan-600 focus:border-double block w-full px-3 py-2"
+                id="content"
+                name=""
+                type="text"
+            ></textarea>
+        </div>
+    </form>
+    <div class="select-none flex items-center justify-end gap-4 text-2xl px-2">
+        <button (click)="save()">
+            <i
+                class="fa-regular fa-floppy-disk text-blue-400 hover:text-blue-500 m-auto"
+            ></i>
+        </button>
+        <button (click)="cancel()">
+            <i
+                class="fa-solid fa-ban text-gray-400 hover:text-gray-500 m-auto"
+            ></i>
+        </button>
+    </div>
+</div>
