@@ -1,0 +1,49 @@
+@if (todo(); as todo) {
+    <div
+        [@fadeInOut]="isOpened()"
+        class="transition-all duration-300 flex flex-col gap-3 p-5 bg-slate-50 shadow shadow-cyan-700/15 rounded-lg hover:shadow-cyan-500/50"
+    >
+        <div class="text-sm text-cyan-600 flex justify-between">
+                    <span
+                    >Added at :
+                        {{ todo.createdAt | date: "MMM d, y - H:mm:ss" }}</span
+                    >
+            @if (todo.duration; as duration) {
+                <span>
+                            Duration :
+                    {{ duration.days }}d
+                    {{ duration.hours }}h {{ duration.minutes }}m
+                    {{ duration.seconds }}s
+                        </span>
+            }
+        </div>
+        <p class="p-3 bg-slate-200/75 rounded-md">
+            {{ todo.content }}
+        </p>
+        <div class="flex items-center gap-4 text-2xl px-2">
+            @if (todo.status === Status.NOT_STARTED) {
+                <button (click)="start(todo)">
+                    <i
+                        class="fa-solid fa-play text-blue-400 hover:text-blue-500"
+                    ></i>
+                </button>
+            } @else if (todo.status === Status.ON_GOING) {
+                <button (click)="complete(todo)">
+                    <i
+                        class="fa-solid fa-stop text-orange-400 hover:text-orange-500 m-auto"
+                    ></i>
+                </button>
+            }
+            <button (click)="update(todo)" class="ms-auto">
+                <i
+                    class="fa-regular fa-pen-to-square text-yellow-400 hover:text-yellow-500 m-auto"
+                ></i>
+            </button>
+            <button (click)="delete(todo)">
+                <i
+                    class="fa-solid fa-trash-can text-red-400 hover:text-red-500 m-auto"
+                ></i>
+            </button>
+        </div>
+    </div>
+}
