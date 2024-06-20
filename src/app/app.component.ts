@@ -42,6 +42,6 @@ export class AppComponent {
     }
 
     filterChange() {
-        this.todoService.changeFilter(this.currentFilter);
+        this.todoService.setFilter(this.currentFilter);
     }
 }

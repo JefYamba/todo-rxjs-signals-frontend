@@ -35,7 +35,7 @@
             }
 
             <div class="ms-auto flex gap-4">
-                @if (!todoService.todoState().isOnEditing) {
+                @if (!todoService.appState().isOnEditState) {
                     <button (click)="update(todo)" class="">
                         <i
                             class="fa-regular fa-pen-to-square text-yellow-400 hover:text-yellow-500 m-auto"

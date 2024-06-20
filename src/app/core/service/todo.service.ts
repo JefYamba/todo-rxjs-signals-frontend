@@ -1,10 +1,25 @@
-import { inject, Injectable, OnDestroy, signal } from '@angular/core';
+import {
+    inject,
+    Injectable,
+    OnDestroy,
+    signal,
+    WritableSignal,
+} from '@angular/core';
 import { TodoApi } from '../api/todo.api';
-import { TodoPageResponse } from '../model/todo-page-response';
-import { TodoState } from '../model/todo-state';
 import { Subscription } from 'rxjs';
 import { TodoRequest } from '../model/todo-request';
 import { Status } from '../model/status';
+import { TodoResponse } from '../model/todo-response';
+
+export interface AppState {
+    isOnEditState: boolean;
+    editingMode?: 'ADD' | 'UPDATE';
+    todo?: TodoResponse;
+    todos: TodoResponse[];
+    filter: Status;
+    filteredTodos: TodoResponse[];
+    searchKey: string;
+}
 
 @Injectable({
     providedIn: 'root',
@@ -27,46 +42,61 @@ export class TodoService implements OnDestroy {
         Status.COMPLETED,
     ];
 
-    #todosPage = signal<TodoPageResponse>({});
-    todosPage = this.#todosPage.asReadonly();
-
-    #todoState = signal<TodoState>({ isOnEditing: false });
-    todoState = this.#todoState.asReadonly();
-
-    #filterState = signal<Status>(Status.ALL);
-    filterState = this.#filterState.asReadonly();
+    #appState: WritableSignal<AppState> = signal<AppState>({
+        isOnEditState: false,
+        filter: Status.ALL,
+        todos: [],
+        filteredTodos: [],
+        searchKey: '',
+    });
+    appState = this.#appState.asReadonly();
 
     constructor() {
         this.getTodos();
     }
 
-    changeFilter(type: Status) {
-        this.#filterState.set(type);
-        this.getTodos();
+    setFilter(filter: Status) {
+        this.#appState.update((value) => {
+            return {
+                ...value,
+                filter: filter,
+            };
+        });
+        this.filterTodos();
     }
 
-    filterTodos() {
-        if (this.filterState() !== Status.ALL) {
-        }
+    setSearchKey(search: string) {
+        this.#appState.update((value) => {
+            return { ...value, searchKey: search };
+        });
+    }
+
+    setEditStateMode(
+        state: boolean,
+        mode: 'ADD' | 'UPDATE' | undefined,
+        todo: TodoResponse | undefined,
+    ) {
+        this.#appState.update((appState) => {
+            return {
+                ...appState,
+                isOnEditState: state,
+                editingMode: mode,
+                todo: todo,
+            };
+        });
     }
 
     getTodos() {
         this.todosSubscription = this.todoApi.todosPage$.subscribe({
             next: (todos) => {
                 if (todos) {
-                    if (this.filterState() === Status.ALL) {
-                        this.#todosPage.set(todos);
-                    } else {
-                        this.#todosPage.update(() => {
-                            return {
-                                ...todos,
-                                content: todos.content?.filter(
-                                    (value) =>
-                                        value.status === this.filterState(),
-                                ),
-                            };
-                        });
-                    }
+                    this.#appState.update((value) => {
+                        return {
+                            ...value,
+                            todos: todos ? todos : [],
+                        };
+                    });
+                    this.filterTodos();
                 }
             },
             error: (err) => {
@@ -77,8 +107,9 @@ export class TodoService implements OnDestroy {
 
     startTodo(id: number) {
         this.startTodoSubscription = this.todoApi.startTodo$(id).subscribe({
-            next: () => {
-                this.getTodos();
+            next: (todoResponse) => {
+                // this.getTodos();
+                this.refreshTodos(todoResponse);
             },
         });
     }
@@ -87,28 +118,39 @@ export class TodoService implements OnDestroy {
         this.completeTodoSubscription = this.todoApi
             .completeTodo$(id)
             .subscribe({
-                next: () => {
-                    this.getTodos();
+                next: (todoResponse) => {
+                    // this.getTodos();
+                    this.refreshTodos(todoResponse);
                 },
             });
     }
 
     saveTodo(todo: TodoRequest) {
-        if (this.todoState().isOnEditing && this.todoState()) {
-            if (this.todoState().editingMode === 'ADD') {
+        if (this.appState().isOnEditState) {
+            if (this.appState().editingMode === 'ADD') {
                 this.addTodoSubscription = this.todoApi.add$(todo).subscribe({
-                    next: () => {
-                        this.getTodos();
-                        this.#todoState.set({ isOnEditing: false });
+                    next: (todoResponse) => {
+                        // this.getTodos();
+                        if (todoResponse) {
+                            this.#appState.update((value) => {
+                                return {
+                                    ...value,
+                                    todos: [todoResponse, ...value.todos],
+                                };
+                            });
+                            this.resetEditStateMode();
+                            this.filterTodos();
+                        }
                     },
                 });
-            } else if (this.todoState().editingMode === 'UPDATE') {
+            } else if (this.appState().editingMode === 'UPDATE') {
                 this.addTodoSubscription = this.todoApi
                     .update$(todo)
                     .subscribe({
-                        next: () => {
-                            this.getTodos();
-                            this.#todoState.set({ isOnEditing: false });
+                        next: (todoResponse) => {
+                            // this.getTodos();
+                            this.resetEditStateMode();
+                            this.refreshTodos(todoResponse);
                         },
                     });
             }
@@ -118,18 +160,53 @@ export class TodoService implements OnDestroy {
     deleteTodo(id: number) {
         this.addTodoSubscription = this.todoApi.delete$(id).subscribe({
             next: () => {
-                this.getTodos();
+                this.#appState.update((appState) => {
+                    return {
+                        ...appState,
+                        todos: appState.todos.filter(
+                            (value) => value.id !== id,
+                        ),
+                    };
+                });
+                this.filterTodos();
             },
         });
     }
 
-    setEditingState(state: TodoState) {
-        this.resetTodoState();
-        this.#todoState.set(state);
+    private refreshTodos(todoResponse: TodoResponse | undefined) {
+        if (todoResponse) {
+            this.#appState.update((value) => {
+                return {
+                    ...value,
+                    todos: value.todos.map((todo) => {
+                        if (todo.id == todoResponse.id) {
+                            return todoResponse;
+                        } else {
+                            return todo;
+                        }
+                    }),
+                };
+            });
+            this.filterTodos();
+        }
     }
 
-    resetTodoState() {
-        this.#todoState.set({ isOnEditing: false });
+    private filterTodos() {
+        this.#appState.update((appState) => {
+            return {
+                ...appState,
+                filteredTodos:
+                    appState.filter === 'ALL'
+                        ? appState.todos
+                        : appState.todos.filter(
+                              (value) => value.status === appState.filter,
+                          ),
+            };
+        });
+    }
+
+    resetEditStateMode() {
+        this.setEditStateMode(false, undefined, undefined);
     }
 
     ngOnDestroy(): void {

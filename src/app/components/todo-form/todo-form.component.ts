@@ -1,6 +1,5 @@
 import { Component, effect, inject } from '@angular/core';
 import { TodoService } from '../../core/service/todo.service';
-import { animate, style, transition, trigger } from '@angular/animations';
 import { FormsModule } from '@angular/forms';
 import { TodoRequest } from '../../core/model/todo-request';
 
@@ -10,23 +9,9 @@ import { TodoRequest } from '../../core/model/todo-request';
     imports: [FormsModule],
     templateUrl: './todo-form.component.html',
     styleUrl: './todo-form.component.css',
-    animations: [
-        trigger('fadeInOut', [
-            transition(':enter', [
-                style({ opacity: 0, height: '0px' }),
-                animate('0.3s', style({ opacity: 1, height: '380px' })),
-            ]),
-            transition(':leave', [
-                style({ opacity: 1, height: '380px' }),
-                animate('0.3s', style({ opacity: 0, height: '0px' })),
-            ]),
-        ]),
-    ],
 })
 export class TodoFormComponent {
     todoService = inject(TodoService);
-    todoState = this.todoService.todoState;
-
     todoRequest: TodoRequest = { id: 0, title: '', content: '' };
 
     constructor() {
@@ -36,9 +21,9 @@ export class TodoFormComponent {
     initForm() {
         effect(() => {
             this.todoRequest = {
-                id: this.todoState().todo?.id,
-                title: this.todoState().todo?.title,
-                content: this.todoState().todo?.content,
+                id: this.todoService.appState().todo?.id,
+                title: this.todoService.appState().todo?.title,
+                content: this.todoService.appState().todo?.content,
             };
         });
     }
@@ -48,13 +33,14 @@ export class TodoFormComponent {
     }
 
     cancel() {
-        this.todoService.resetTodoState();
+        this.todoService.resetEditStateMode();
     }
 
     add() {
-        this.todoService.setEditingState({
+        /*this.todoService.setEditingState({
             isOnEditing: true,
             editingMode: 'ADD',
-        });
+        });*/
+        this.todoService.setEditStateMode(true, 'ADD', undefined);
     }
 }

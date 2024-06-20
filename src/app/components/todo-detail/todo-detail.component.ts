@@ -30,11 +30,7 @@ export class TodoDetailComponent {
     }
 
     update(todo: TodoResponse) {
-        this.todoService.setEditingState({
-            isOnEditing: true,
-            editingMode: 'UPDATE',
-            todo: todo,
-        });
+        this.todoService.setEditStateMode(true, 'UPDATE', todo);
     }
 
     delete(todo: TodoResponse) {

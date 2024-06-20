@@ -2,7 +2,6 @@ import { inject, Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, map, Observable, tap, throwError } from 'rxjs';
 import { ApiResponse } from '../model/api-response';
-import { TodoPageResponse } from '../model/todo-page-response';
 import { TodoResponse } from '../model/todo-response';
 import { TodoRequest } from '../model/todo-request';
 
@@ -13,12 +12,12 @@ export class TodoApi {
     httpClient = inject(HttpClient);
     API_URL: string = 'http://localhost:8080/api/todos';
 
-    todosPage$: Observable<TodoPageResponse | undefined> = this.httpClient
+    todosPage$: Observable<TodoResponse[] | undefined> = this.httpClient
         .get<ApiResponse>(`${this.API_URL}`)
         .pipe(
             map(
-                (apiResponse): TodoPageResponse | undefined =>
-                    apiResponse.data.todos,
+                (apiResponse): TodoResponse[] | undefined =>
+                    apiResponse.data.todos?.content,
             ),
             catchError(this.handleErrors),
         );
