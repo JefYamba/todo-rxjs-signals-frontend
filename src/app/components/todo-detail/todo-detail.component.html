@@ -1,7 +1,6 @@
 @if (todo(); as todo) {
     <div
-        [@fadeInOut]="isOpened()"
-        class="transition-all duration-300 flex flex-col gap-3 p-5 bg-slate-50 shadow shadow-cyan-700/15 rounded-lg hover:shadow-cyan-500/50"
+        class="transition-all overflow-hidden duration-300 flex flex-col gap-3 p-5 bg-slate-50 shadow shadow-cyan-700/15 rounded-lg hover:shadow-cyan-500/50"
     >
         <div class="text-sm text-cyan-600 flex justify-between">
                     <span
@@ -34,16 +33,23 @@
                     ></i>
                 </button>
             }
-            <button (click)="update(todo)" class="ms-auto">
-                <i
-                    class="fa-regular fa-pen-to-square text-yellow-400 hover:text-yellow-500 m-auto"
-                ></i>
-            </button>
-            <button (click)="delete(todo)">
-                <i
-                    class="fa-solid fa-trash-can text-red-400 hover:text-red-500 m-auto"
-                ></i>
-            </button>
+
+            <div class="ms-auto flex gap-4">
+                @if (!todoService.todoState().isOnEditing) {
+                    <button (click)="update(todo)" class="">
+                        <i
+                            class="fa-regular fa-pen-to-square text-yellow-400 hover:text-yellow-500 m-auto"
+                        ></i>
+                    </button>
+                }
+                <button (click)="delete(todo)">
+                    <i
+                        class="fa-solid fa-trash-can text-red-400 hover:text-red-500 m-auto"
+                    ></i>
+                </button>
+            </div>
+
+
         </div>
     </div>
 }

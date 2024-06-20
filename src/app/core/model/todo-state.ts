@@ -1,7 +1,7 @@
-import { TodoEditingState } from './todo-editing-state';
 import { TodoResponse } from './todo-response';
 
 export interface TodoState {
-    state: TodoEditingState;
+    isOnEditing: boolean;
+    editingMode?: 'ADD' | 'UPDATE';
     todo?: TodoResponse;
 }

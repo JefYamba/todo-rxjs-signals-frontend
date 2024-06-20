@@ -15,11 +15,11 @@ import { animate, style, transition, trigger } from '@angular/animations';
         trigger('fadeInOut', [
             transition(':enter', [
                 style({ opacity: 0, height: '0px' }),
-                animate('0.35s', style({ opacity: 1, height: '*' })),
+                animate('0.3s', style({ opacity: 1, height: '*' })),
             ]),
             transition(':leave', [
                 style({ opacity: 1, height: '*' }),
-                animate('0.35s', style({ opacity: 0, height: '0px' })),
+                animate('0.3s', style({ opacity: 0, height: '0px' })),
             ]),
         ]),
     ],

@@ -37,7 +37,10 @@
             </div>
         </div>
         @if (isOpened()) {
-            <app-todo-detail [isOpened]="isOpened()" [@fadeInOut]="isOpened()" [todo]="todo"></app-todo-detail>
+            <div class="overflow-hidden" [@fadeInOut]="isOpened()">
+                <app-todo-detail [todo]="todo"></app-todo-detail>
+            </div>
+
         }
     }
 </div>
